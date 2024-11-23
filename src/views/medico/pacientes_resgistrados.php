@@ -11,7 +11,7 @@ if (!$id_medico) {
 }
 
 $pacienteModel = new Paciente($conn);
-$pacientes = $pacienteModel->obtenerPacientesPorMedico($id_medico);
+$pacientes = $pacienteModel->obtenerPacientesConRegistrosYTratamientos($id_medico);
 ?>
 
 <!DOCTYPE html>
@@ -19,50 +19,123 @@ $pacientes = $pacienteModel->obtenerPacientesPorMedico($id_medico);
 <head>
     <meta charset="UTF-8">
     <title>Pacientes Registrados</title>
+    <style>
+        .menu-desplegable {
+            display: inline-block;
+            position: relative;
+        }
+
+        .menu-desplegable-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .menu-desplegable:hover .menu-desplegable-content {
+            display: block;
+        }
+
+        .menu-desplegable-content a,
+        .menu-desplegable-content button {
+            padding: 10px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .menu-desplegable-content a:hover,
+        .menu-desplegable-content button:hover {
+            background-color: #f1f1f1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .btn {
+            padding: 5px 10px;
+            text-decoration: none;
+            background-color: #008CBA;
+            color: white;
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+
+        .btn:hover {
+            background-color: #006F8E;
+        }
+    </style>
 </head>
 <body>
     <h1>Pacientes Registrados</h1>
-    <table border="1">
+    <p><a href="/DrOnline/src/views/medico/registrar_paciente.php" class="btn">Agregar Nuevo Paciente</a></p>
+    <table>
         <thead>
             <tr>
                 <th>ID Paciente</th>
                 <th>Nombre</th>
                 <th>Email</th>
-                <th>Fecha de Nacimiento</th>
-                <th>Sexo</th>
                 <th>Dirección</th>
                 <th>Teléfono</th>
+                <th>Últimos Registros Médicos</th>
+                <th>Tratamientos Asignados</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($pacientes as $paciente): ?>
+            <?php if (empty($pacientes)): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($paciente['id_paciente']); ?></td>
-                    <td><?php echo htmlspecialchars($paciente['nombre_paciente']); ?></td>
-                    <td><?php echo htmlspecialchars($paciente['email_paciente']); ?></td>
-                    <td><?php echo htmlspecialchars($paciente['fecha_nacimiento']); ?></td>
-                    <td><?php echo htmlspecialchars($paciente['sexo']); ?></td>
-                    <td><?php echo htmlspecialchars($paciente['direccion']); ?></td>
-                    <td><?php echo htmlspecialchars($paciente['telefono']); ?></td>
-                    <td>
-                        <!-- Botón para Editar -->
-                        <form action="editar_paciente.php" method="post" style="display:inline;">
-                            <input type="hidden" name="id_paciente" value="<?php echo $paciente['id_paciente']; ?>">
-                            <button type="submit">Editar</button>
-                        </form>
-                        
-                        <!-- Botón para Eliminar -->
-                        <form action="../../controllers/pacientesController.php" method="post" style="display:inline;">
-                            <input type="hidden" name="action" value="eliminar">
-                            <input type="hidden" name="id_paciente" value="<?php echo $paciente['id_paciente']; ?>">
-                            <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este paciente?')">Eliminar</button>
-                        </form>
-                    </td>
+                    <td colspan="8">No hay pacientes registrados.</td>
                 </tr>
-            <?php endforeach; ?>
+            <?php else: ?>
+                <?php foreach ($pacientes as $paciente): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($paciente['id_paciente']); ?></td>
+                        <td><?php echo htmlspecialchars($paciente['nombre_paciente']); ?></td>
+                        <td><?php echo htmlspecialchars($paciente['email_paciente']); ?></td>
+                        <td><?php echo htmlspecialchars($paciente['direccion']); ?></td>
+                        <td><?php echo htmlspecialchars($paciente['telefono']); ?></td>
+                        <td>
+                            Tensión Arterial: <?php echo htmlspecialchars($paciente['tension_arterial'] ?? 'N/A'); ?><br>
+                            Glicemia: <?php echo htmlspecialchars($paciente['glicemia'] ?? 'N/A'); ?><br>
+                            Síntomas: <?php echo htmlspecialchars($paciente['sintomas'] ?? 'N/A'); ?><br>
+                        </td>
+                        <td>
+                            <a href="/DrOnline/src/views/medico/tratamientos_asignados.php?id_paciente=<?php echo $paciente['id_paciente']; ?>" class="btn">Ver Tratamientos</a>
+                        </td>
+                        <td>
+                            <div class="menu-desplegable">
+                                <button>Opciones</button>
+                                <div class="menu-desplegable-content">
+                                    <a href="/DrOnline/src/views/medico/asignar_tratamiento.php?id_paciente=<?php echo htmlspecialchars($paciente['id_paciente']); ?>">Asignar Tratamiento</a>
+                                    <a href="/DrOnline/src/views/medico/asignar_cita.php?id_paciente=<?php echo htmlspecialchars($paciente['id_paciente']); ?>">Asignar Cita</a>
+                                    <a href="/DrOnline/src/views/medico/editar_paciente.php?id_paciente=<?php echo htmlspecialchars($paciente['id_paciente']); ?>">Editar</a>
+                                    <a href="../../controllers/pacientesController.php?action=eliminar&id_paciente=<?php echo htmlspecialchars($paciente['id_paciente']); ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar este paciente?');">Eliminar</a>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </tbody>
     </table>
 </body>
 </html>
-

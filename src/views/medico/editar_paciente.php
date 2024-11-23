@@ -2,24 +2,18 @@
 require_once '../../../config/database.php';
 require_once '../../models/Paciente.php';
 
-session_start();
-$id_medico = $_SESSION['id_medico'] ?? null;
+$id_paciente = $_GET['id_paciente'] ?? null;
 
-// Verifica que se haya enviado el ID del paciente a editar
-if (!isset($_POST['id_paciente'])) {
+if (!$id_paciente) {
     echo "Error: No se ha especificado el ID del paciente.";
     exit;
 }
 
-$id_paciente = $_POST['id_paciente'];
 $pacienteModel = new Paciente($conn);
-
-// Obtiene los datos actuales del paciente
 $paciente = $pacienteModel->obtenerPacientePorId($id_paciente);
 
-// Verifica que el paciente exista
 if (!$paciente) {
-    echo "Error: El paciente no existe.";
+    echo "Error: Paciente no encontrado.";
     exit;
 }
 ?>
@@ -46,7 +40,10 @@ if (!$paciente) {
         <input type="date" name="fecha_nacimiento" value="<?php echo htmlspecialchars($paciente['fecha_nacimiento']); ?>" required><br>
 
         <label for="sexo">Sexo:</label>
-        <input type="text" name="sexo" value="<?php echo htmlspecialchars($paciente['sexo']); ?>" required><br>
+        <select name="sexo" required>
+            <option value="M" <?php echo $paciente['sexo'] === 'M' ? 'selected' : ''; ?>>Masculino</option>
+            <option value="F" <?php echo $paciente['sexo'] === 'F' ? 'selected' : ''; ?>>Femenino</option>
+        </select><br>
 
         <label for="direccion">Dirección:</label>
         <input type="text" name="direccion" value="<?php echo htmlspecialchars($paciente['direccion']); ?>" required><br>

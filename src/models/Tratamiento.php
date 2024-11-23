@@ -8,7 +8,15 @@ class Tratamiento {
 
     // Obtener todos los tratamientos para un médico específico
     public function obtenerTratamientosPorMedico($id_medico) {
-        $query = "SELECT * FROM tratamientos WHERE id_medico = :id_medico";
+        $query = "SELECT 
+                      t.*,
+                      u.nombre AS nombre_paciente,
+                      u.email AS email_paciente
+                  FROM tratamientos t
+                  JOIN pacientes p ON t.id_paciente = p.id_paciente
+                  JOIN usuarios u ON p.id_usuario = u.id_usuario
+                  WHERE t.id_medico = :id_medico
+                  ORDER BY t.id_paciente, t.fecha_inicio";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(':id_medico', $id_medico, PDO::PARAM_INT);
         $stmt->execute();
@@ -58,5 +66,16 @@ class Tratamiento {
         $stmt->bindParam(':id_tratamiento', $id_tratamiento, PDO::PARAM_INT);
         return $stmt->execute();
     }
+
+    public function obtenerTratamientosPorPaciente($id_paciente) {
+        $query = "SELECT id_tratamiento, descripcion, fecha_inicio, fecha_fin, estado
+                  FROM tratamientos
+                  WHERE id_paciente = :id_paciente";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bindParam(':id_paciente', $id_paciente, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    
 }
 ?>

@@ -18,7 +18,7 @@
         ?>
 
         <form action="../../controllers/pacientesController.php" method="POST">
-            <input type="hidden" name="action" value="crear_paciente">
+            <input type="hidden" name="action" value="crear">
             <input type="hidden" name="id_medico" value="<?php echo $id_medico; ?>">
 
             <!-- Datos de Usuario -->
