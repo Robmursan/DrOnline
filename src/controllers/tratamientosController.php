@@ -27,7 +27,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $resultado = $tratamientoModel->crearTratamiento($id_medico, $id_paciente, $descripcion, $fecha_inicio, $fecha_fin, $estado);
 
             if ($resultado) {
-                header("Location: ../views/medico/tratamientos_asignados.php");
+                // Redirige a la lista de tratamientos del paciente
+                header("Location: ../views/medico/tratamientos_paciente.php?id_paciente=" . $id_paciente);
                 exit;
             } else {
                 echo "Error al crear el tratamiento.";
@@ -38,6 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     } elseif ($action === 'actualizar') {
         $id_tratamiento = $_POST['id_tratamiento'] ?? null;
+        $id_paciente = $_POST['id_paciente'] ?? null;
         $descripcion = $_POST['descripcion'] ?? '';
         $fecha_inicio = $_POST['fecha_inicio'] ?? '';
         $fecha_fin = $_POST['fecha_fin'] ?? '';
@@ -47,7 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $resultado = $tratamientoModel->actualizarTratamiento($id_tratamiento, $descripcion, $fecha_inicio, $fecha_fin, $estado);
 
             if ($resultado) {
-                header("Location: ../views/medico/tratamientos_asignados.php");
+                // Redirige a la lista de tratamientos del paciente
+                header("Location: ../views/medico/tratamientos_paciente.php?id_paciente=" . $id_paciente);
                 exit;
             } else {
                 echo "Error al actualizar el tratamiento.";
@@ -58,12 +61,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     } elseif ($action === 'eliminar') {
         $id_tratamiento = $_POST['id_tratamiento'] ?? null;
+        $id_paciente = $_POST['id_paciente'] ?? null;
 
         if ($id_tratamiento) {
             $resultado = $tratamientoModel->eliminarTratamiento($id_tratamiento);
 
             if ($resultado) {
-                header("Location: ../views/medico/tratamientos_asignados.php");
+                // Redirige a la lista de tratamientos del paciente
+                header("Location: ../views/medico/tratamientos_paciente.php?id_paciente=" . $id_paciente);
                 exit;
             } else {
                 echo "Error al eliminar el tratamiento.";

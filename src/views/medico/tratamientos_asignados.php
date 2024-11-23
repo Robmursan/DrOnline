@@ -5,15 +5,16 @@ require_once '../../models/Tratamiento.php';
 // Capturar el ID del paciente desde la URL
 $id_paciente = $_GET['id_paciente'] ?? null;
 
+// Redirigir si no se proporciona un ID de paciente
 if (!$id_paciente) {
-    echo '<script type="text/javascript">';
-    echo 'alert("Error: No se ha especificado un ID de paciente válido.");';
-    echo 'window.location.href = "/DrOnline/src/views/medico/pacientes_resgistrados.php";';
-    echo '</script>';
+    header("Location: /DrOnline/src/views/medico/pacientes_resgistrados.php");
     exit;
 }
 
+// Crear instancia del modelo de tratamiento
 $tratamientoModel = new Tratamiento($conn);
+
+// Obtener los tratamientos asignados al paciente
 $tratamientos = $tratamientoModel->obtenerTratamientosPorPaciente($id_paciente);
 ?>
 
@@ -68,6 +69,7 @@ $tratamientos = $tratamientoModel->obtenerTratamientosPorPaciente($id_paciente);
     <h1>Tratamientos Asignados al Paciente</h1>
     <!-- Enlace para asignar un nuevo tratamiento -->
     <p><a href="crear_tratamiento.php?id_paciente=<?php echo htmlspecialchars($id_paciente); ?>" class="btn">Asignar Nuevo Tratamiento</a></p>
+    
     <?php if (empty($tratamientos)): ?>
         <p>No hay tratamientos asignados a este paciente.</p>
     <?php else: ?>
@@ -92,10 +94,11 @@ $tratamientos = $tratamientoModel->obtenerTratamientosPorPaciente($id_paciente);
                         <td><?php echo htmlspecialchars($tratamiento['estado']); ?></td>
                         <td>
                             <!-- Botones de acción -->
-                            <a href="editar_tratamiento.php?id_tratamiento=<?php echo $tratamiento['id_tratamiento']; ?>" class="btn">Editar</a>
-                            <form action="../../controllers/tratamiento.php" method="post" style="display:inline;">
+                            <a href="/DrOnline/src/views/medico/editar_tratamiento.php?id_tratamiento=<?php echo htmlspecialchars($tratamiento['id_tratamiento']); ?>&id_paciente=<?php echo htmlspecialchars($id_paciente); ?>" class="btn">Editar</a>
+                            <form action="../../controllers/tratamientosController.php" method="post" style="display:inline;">
                                 <input type="hidden" name="action" value="eliminar">
-                                <input type="hidden" name="id_tratamiento" value="<?php echo $tratamiento['id_tratamiento']; ?>">
+                                <input type="hidden" name="id_tratamiento" value="<?php echo htmlspecialchars($tratamiento['id_tratamiento']); ?>">
+                                <input type="hidden" name="id_paciente" value="<?php echo htmlspecialchars($id_paciente); ?>">
                                 <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este tratamiento?');">Eliminar</button>
                             </form>
                         </td>
@@ -104,6 +107,7 @@ $tratamientos = $tratamientoModel->obtenerTratamientosPorPaciente($id_paciente);
             </tbody>
         </table>
     <?php endif; ?>
+    
     <!-- Enlace para volver a la lista de pacientes -->
     <p><a href="/DrOnline/src/views/medico/pacientes_resgistrados.php" class="btn">Volver a Pacientes</a></p>
 </body>
