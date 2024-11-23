@@ -1,0 +1,17 @@
+{
+    "name": "robmu/dr-online",
+    "autoload": {
+        "psr-4": {
+            "Robmu\\DrOnline\\": "app/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Roberto"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "vlucas/phpdotenv":"^5.4"
+    }
+}
